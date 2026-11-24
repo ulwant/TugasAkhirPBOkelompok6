@@ -1,6 +1,7 @@
 package controller;
 
 import dao.ParkirDAO;
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -20,6 +21,7 @@ import javafx.scene.shape.SVGPath;
 import javafx.print.PrinterJob;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import model.Petugas;
 import model.SlotParkir;
 import model.SlotPenuhException;
@@ -199,6 +201,7 @@ public class ParkirController implements Initializable {
     // ==========================================
     @FXML private HBox boxNotice;
     @FXML private Label lblNoticeText;
+    private PauseTransition noticeDismissTimer;
 
     // Data lists
     private final ObservableList<TransaksiParkir> transaksiList = FXCollections.observableArrayList();
@@ -777,7 +780,9 @@ public class ParkirController implements Initializable {
         lblTotalTitle.setStyle("-fx-font-size: 14px; -fx-text-fill: #333;");
         Region r = new Region();
         HBox.setHgrow(r, Priority.ALWAYS);
-        Label lblTotalValue = new Label(tx.getTotalBiayaFormatted());
+        // Gunakan transaksi preview yang sudah dihitung pada waktu keluar yang sama
+        // dengan transaksi yang nanti disimpan oleh DAO.
+        Label lblTotalValue = new Label(preview.getTotalBiayaFormatted());
         lblTotalValue.setStyle("-fx-font-family: 'IBM Plex Mono', monospace; -fx-font-size: 26px; -fx-font-weight: bold;");
         totalRow.getChildren().addAll(lblTotalTitle, r, lblTotalValue);
 
@@ -1394,16 +1399,22 @@ public class ParkirController implements Initializable {
     private void tampilkanNotice(String pesan) {
         if (boxNotice != null && lblNoticeText != null) {
             lblNoticeText.setText(pesan);
-            boxNotice.setVisible(true);
             boxNotice.setManaged(true);
+            boxNotice.setVisible(true);
+            // StackPane meregangkan Region ke seluruh area bila batas maksimumnya tak dibatasi.
+            // Kunci kedua dimensi pada ukuran preferensi agar toast tetap kecil.
+            boxNotice.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+            // FXML menempatkan toast sebagai overlay pada StackPane konten utama.
+            // Set kembali alignment/margin di sini agar tetap kanan bawah setelah layout berubah.
+            if (boxNotice.getParent() instanceof StackPane overlay) {
+                StackPane.setAlignment(boxNotice, Pos.BOTTOM_RIGHT);
+                StackPane.setMargin(boxNotice, new javafx.geometry.Insets(0, 24, 24, 24));
+            }
 
-            // Auto dismiss notice setelah 4.5 detik
-            new Thread(() -> {
-                try {
-                    Thread.sleep(4500);
-                    Platform.runLater(this::tutupNotice);
-                } catch (InterruptedException ignored) {}
-            }).start();
+            if (noticeDismissTimer != null) noticeDismissTimer.stop();
+            noticeDismissTimer = new PauseTransition(Duration.seconds(4.5));
+            noticeDismissTimer.setOnFinished(event -> tutupNotice());
+            noticeDismissTimer.playFromStart();
         } else {
             System.out.println("[NOTICE] " + pesan);
         }
@@ -1411,6 +1422,7 @@ public class ParkirController implements Initializable {
 
     @FXML
     public void tutupNotice() {
+        if (noticeDismissTimer != null) noticeDismissTimer.stop();
         if (boxNotice != null) {
             boxNotice.setVisible(false);
             boxNotice.setManaged(false);
