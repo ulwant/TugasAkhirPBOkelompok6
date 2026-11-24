@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;550;600;650;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'DM Sans', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+}
+
+@layer base {
+  body { min-width: 320px; }
+  button, select, input[type='radio'], input[type='checkbox'] { cursor: pointer; }
+  button { transition: background-color 120ms; }
+  button:disabled, input:disabled, select:disabled { cursor: not-allowed; }
+  :where(a, button, input, select, textarea, summary, [role='button'], [role='tab']):focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@media print {
+  body { background: white; }
+  dialog[open] { position: absolute; width: 100%; max-width: none; max-height: none; border: none; }
+  body:has(dialog[open]) main, body:has(dialog[open]) header, body:has(dialog[open]) aside, body:has(dialog[open]) footer { display: none; }
+}

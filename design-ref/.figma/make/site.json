@@ -1,0 +1,10 @@
+{
+  "description": "Aplikasi manajemen parkir untuk petugas mencatat transaksi kendaraan, mengelola slot, menghitung tarif, dan memantau pendapatan serta ketersediaan secara real time.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
