@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controller.ParkirController"
+      spacing="20"
+      stylesheets="@style.css"
+      style="-fx-padding: 20; -fx-background-color: #ededed;">
+
+    <!-- ROW ATAS: 3 Summary Cards -->
+    <HBox spacing="16">
+
+        <!-- Total Slot -->
+        <VBox styleClass="stat-card" spacing="4" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+            <Label text="Total slot" styleClass="stat-card-label"/>
+            <Label fx:id="lblTotalSlot" text="00" styleClass="stat-card-value"/>
+        </VBox>
+
+        <!-- Tersedia -->
+        <VBox styleClass="stat-card" spacing="4" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+            <Label text="Tersedia" styleClass="stat-card-label"/>
+            <Label fx:id="lblSlotTersedia" text="00" styleClass="stat-card-value"/>
+        </VBox>
+
+        <!-- Terisi -->
+        <VBox styleClass="stat-card" spacing="4" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+            <Label text="Terisi" styleClass="stat-card-label"/>
+            <Label fx:id="lblSlotTerisi" text="00" styleClass="stat-card-value"/>
+        </VBox>
+
+    </HBox>
+
+    <!-- ROW BAWAH -->
+    <HBox spacing="20" VBox.vgrow="ALWAYS">
+
+        <!-- PANEL KIRI "A" — Tambah/Ubah Slot -->
+        <VBox prefWidth="300" styleClass="panel-box">
+
+            <!-- Panel Header -->
+            <HBox styleClass="panel-header" alignment="CENTER_LEFT" spacing="12">
+                <Label text="A" styleClass="panel-letter"/>
+                <Label fx:id="lblSlotFormTitle" text="Tambah Slot" styleClass="panel-title"/>
+            </HBox>
+
+            <!-- Form Body -->
+            <VBox spacing="16" style="-fx-padding: 20;">
+
+                <!-- ZONA / LANTAI -->
+                <VBox spacing="6">
+                    <Label text="ZONA" styleClass="field-label"/>
+                    <ComboBox fx:id="cmbLantaiZona" styleClass="input-field" maxWidth="Infinity"/>
+                </VBox>
+
+                <VBox spacing="6">
+                    <Label text="NOMOR SLOT" styleClass="field-label"/>
+                    <TextField fx:id="txtKodeSlot" styleClass="input-field" promptText="Contoh: 01" />
+                </VBox>
+
+                <!-- JENIS KENDARAAN -->
+                <VBox spacing="6">
+                    <Label text="JENIS KENDARAAN" styleClass="field-label"/>
+                    <TextField fx:id="txtJenisSlot" styleClass="input-field" editable="false" focusTraversable="false" />
+                </VBox>
+
+                <!-- TOMBOL -->
+                <HBox spacing="8">
+                    <Button fx:id="btnSimpanSlot" text="SIMPAN SLOT"
+                            styleClass="btn-primary" onAction="#simpanSlot"/>
+                    <Button text="RESET"
+                            styleClass="btn-secondary" onAction="#resetFormSlot"/>
+                </HBox>
+
+            </VBox>
+
+        </VBox>
+
+        <!-- PANEL KANAN "B" — Daftar Slot Parkir -->
+        <VBox styleClass="panel-box" HBox.hgrow="ALWAYS">
+
+            <!-- Panel Header -->
+            <HBox styleClass="panel-header" alignment="CENTER_LEFT" spacing="12">
+                <Label text="B" styleClass="panel-letter"/>
+                <Label text="Daftar Slot Parkir" styleClass="panel-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <ComboBox fx:id="cmbFilterSlot" prefWidth="130" styleClass="input-field" onAction="#filterSlot"/>
+            </HBox>
+
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-background: transparent;">
+                <content>
+                    <FlowPane fx:id="fpSlotGrid" hgap="12" vgap="12" prefWrapLength="680" style="-fx-padding: 20; -fx-background-color: #fcfcfc;" />
+                </content>
+            </ScrollPane>
+
+            <!-- Table model retained for controller selection and accessibility. -->
+            <TableView fx:id="tblSlot" managed="false" visible="false" prefHeight="0">
+                <columns>
+                    <TableColumn fx:id="colKodeSlot" text="KODE" prefWidth="100"/>
+                    <TableColumn fx:id="colZonaSlot" text="ZONA" prefWidth="140"/>
+                    <TableColumn fx:id="colJenisSlot" text="JENIS" prefWidth="120"/>
+                    <TableColumn fx:id="colStatusSlot" text="STATUS" prefWidth="120"/>
+                </columns>
+            </TableView>
+
+        </VBox>
+
+    </HBox>
+
+</VBox>

@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.SVGPath?>
+
+<BorderPane prefHeight="800.0" prefWidth="1440.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ParkirController">
+
+    <!-- ═══════════════════════════════════════════════════════
+         SIDEBAR KIRI (#151515)
+         ═══════════════════════════════════════════════════════ -->
+    <left>
+        <VBox prefWidth="224.0" styleClass="sidebar">
+            <children>
+                <VBox spacing="0.0" style="-fx-padding: 28 0 0 0;">
+                    <Button fx:id="btnNavDashboard" maxWidth="Infinity" onAction="#navDashboard" styleClass="nav-btn, nav-btn-active" text="Dashboard" />
+                    <Button fx:id="btnNavTransaksi" maxWidth="Infinity" onAction="#navTransaksi" styleClass="nav-btn" text="Transaksi Parkir" />
+                    <Button fx:id="btnNavSlot" maxWidth="Infinity" onAction="#navSlot" styleClass="nav-btn" text="Manajemen Slot" />
+                    <Button fx:id="btnNavLaporan" maxWidth="Infinity" onAction="#navLaporan" styleClass="nav-btn" text="Laporan Pendapatan" />
+                </VBox>
+                <Region VBox.vgrow="ALWAYS" />
+                <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="petugas-card">
+                    <Label fx:id="lblPetugasInitial" alignment="CENTER" minHeight="36.0" minWidth="36.0" style="-fx-border-color: #626262; -fx-border-width: 1; -fx-font-family: 'IBM Plex Mono', monospace; -fx-font-size: 12px; -fx-text-fill: white;" text="AD" />
+                    <VBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+                        <Label fx:id="lblPetugasNama" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;" text="Administrator" />
+                        <Label fx:id="lblPetugasRole" style="-fx-text-fill: #999; -fx-font-size: 11px;" text="Petugas Parkir" />
+                    </VBox>
+                    <Button fx:id="btnLogout" onAction="#handleLogout" styleClass="logout-btn" tooltip="$tooltipLogout">
+                        <graphic><SVGPath content="M10 17l5-5-5-5 M15 12H3 M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6" style="-fx-fill: transparent; -fx-stroke: #aaaaaa; -fx-stroke-width: 1.6;" /></graphic>
+                        <tooltip><Tooltip fx:id="tooltipLogout" text="Logout Petugas" /></tooltip>
+                    </Button>
+                </HBox>
+            </children>
+        </VBox>
+    </left>
+
+    <!-- ═══════════════════════════════════════════════════════
+         KONTEN TENGAH / KANAN
+         ═══════════════════════════════════════════════════════ -->
+    <center>
+        <StackPane style="-fx-background-color: #ededed;">
+            <VBox spacing="0.0">
+
+                <!-- 1. Header Bar Atas -->
+                <HBox alignment="CENTER_LEFT" styleClass="header-bar">
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <Label styleClass="header-sys-label" text="SISTEM" />
+                        <Label styleClass="header-sys-title" text="MANAJEMEN PARKIR KAMPUS" />
+                    </HBox>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <HBox alignment="CENTER_RIGHT" spacing="16.0">
+                        <Label fx:id="lblHeaderDate" style="-fx-font-family: 'IBM Plex Mono', monospace; -fx-font-size: 10px; -fx-text-fill: #777;" text="Selasa, 24 November 2026" />
+                        <Label styleClass="badge-light" text="PETUGAS" />
+                    </HBox>
+                </HBox>
+
+                <!-- 2. Scrollable Body Content -->
+                <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
+                    <content>
+                        <VBox spacing="20.0" maxWidth="1320.0" style="-fx-padding: 28;">
+
+                            <!-- Page Header Banner (Dinamis Sesuai Halaman) -->
+                            <HBox alignment="CENTER_LEFT" spacing="16.0">
+                                <VBox alignment="CENTER_LEFT" spacing="8.0">
+                                    <Label fx:id="lblPageTitle" styleClass="page-title" text="Dashboard" />
+                                    <Label fx:id="lblPageDesc" styleClass="page-desc" text="Ringkasan aktivitas dan operasional parkir hari ini." />
+                                </VBox>
+                                <Label fx:id="lblPageNumber" managed="false" visible="false" text="01" />
+                                <Region HBox.hgrow="ALWAYS" />
+                                <!-- Action Button Header Kanan (Dinamis) -->
+                                <HBox fx:id="boxHeaderActions" alignment="CENTER_RIGHT" spacing="10.0">
+                                    <Button fx:id="btnTopAction" onAction="#navTransaksi" styleClass="btn-primary" text="+ KENDARAAN MASUK" />
+                                    <Button fx:id="btnTopExport" onAction="#eksporCSV" styleClass="btn-secondary" text="EKSPOR CSV" visible="false" managed="false"><graphic><SVGPath content="M12 3v12 M7 10l5 5 5-5 M5 20h14" style="-fx-fill: transparent; -fx-stroke: #222222; -fx-stroke-width: 1.6;" /></graphic></Button>
+                                    <Button fx:id="btnTopPrint" onAction="#cetakLaporan" styleClass="btn-primary" text="CETAK LAPORAN" visible="false" managed="false" />
+                                </HBox>
+                            </HBox>
+
+                            <!-- STACK CONTAINER UNTUK 4 HALAMAN -->
+                            <StackPane VBox.vgrow="ALWAYS">
+
+                                <!-- ═════════════════════════════════════════════════
+                                     HALAMAN 1: DASHBOARD
+                                     ═════════════════════════════════════════════════ -->
+                                <VBox fx:id="vboxDashboard" spacing="20.0">
+                                    <!-- 4 Stat Cards Top Row -->
+                                    <HBox spacing="16.0">
+                                        <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                                            <Label styleClass="stat-card-label" text="Kendaraan masuk" />
+                                            <Label fx:id="lblStatMasuk" styleClass="stat-card-value" text="00" />
+                                            <Label styleClass="stat-card-note" text="Total transaksi hari ini" />
+                                        </VBox>
+
+                                        <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                                            <Label styleClass="stat-card-label" text="Sedang parkir" />
+                                            <Label fx:id="lblStatAktif" styleClass="stat-card-value" text="00" />
+                                            <Label styleClass="stat-card-note" text="Kendaraan di area parkir" />
+                                        </VBox>
+
+                                        <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                                            <Label styleClass="stat-card-label" text="Slot tersedia" />
+                                            <Label fx:id="lblStatSlot" styleClass="stat-card-value" text="00" />
+                                            <Label fx:id="lblStatSlotNote" styleClass="stat-card-note" text="Dari 5 slot parkir" />
+                                        </VBox>
+
+                                        <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                                            <Label styleClass="stat-card-label" text="Pendapatan hari ini" />
+                                            <Label fx:id="lblStatPendapatan" styleClass="stat-card-value" text="Rp 0" />
+                                            <Label fx:id="lblStatPendNote" styleClass="stat-card-note" text="0 transaksi selesai" />
+                                        </VBox>
+                                    </HBox>
+
+                                    <!-- Middle Row: Panel A & Panel B -->
+                                    <HBox spacing="20.0">
+                                        <!-- Panel A: Aktivitas Terbaru (Table) -->
+                                        <VBox styleClass="panel-box" HBox.hgrow="ALWAYS">
+                                            <HBox alignment="CENTER_LEFT" styleClass="panel-header">
+                                                <Label styleClass="panel-title" text="Aktivitas Terbaru" />
+                                                <Region HBox.hgrow="ALWAYS" />
+                                                <Button onAction="#navTransaksi" style="-fx-background-color: transparent; -fx-font-family: 'IBM Plex Mono', monospace; -fx-font-size: 11px; -fx-text-fill: #666; -fx-cursor: hand;" text="LIHAT SEMUA"><graphic><SVGPath content="M3 12h18 M15 6l6 6-6 6" style="-fx-fill: transparent; -fx-stroke: #666666; -fx-stroke-width: 1.5;" /></graphic></Button>
+                                            </HBox>
+                                            <TableView fx:id="tblDashboard" prefHeight="260.0" VBox.vgrow="ALWAYS">
+                                                <columns>
+                                                    <TableColumn fx:id="colDashId" prefWidth="95.0" text="ID TRANSAKSI" />
+                                                    <TableColumn fx:id="colDashKendaraan" prefWidth="200.0" text="KENDARAAN" />
+                                                    <TableColumn fx:id="colDashSlot" prefWidth="75.0" text="SLOT" />
+                                                    <TableColumn fx:id="colDashMasuk" prefWidth="120.0" text="MASUK" />
+                                                    <TableColumn fx:id="colDashStatus" prefWidth="100.0" text="STATUS" />
+                                                </columns>
+                                                <placeholder>
+                                                    <Label style="-fx-text-fill: #888;" text="Belum ada aktivitas transaksi parkir." />
+                                                </placeholder>
+                                            </TableView>
+                                            <HBox style="-fx-padding: 12 16; -fx-border-color: #dedede transparent transparent transparent; -fx-border-width: 1;">
+                                                <Label style="-fx-font-family: 'IBM Plex Mono', monospace; -fx-font-size: 11px; -fx-text-fill: #777;" text="Menampilkan 5 aktivitas terbaru hari ini" />
+                                            </HBox>
+                                        </VBox>
+
+                                        <VBox prefWidth="280.0">
+                                            <VBox styleClass="panel-box">
+                                                <HBox alignment="CENTER_LEFT" styleClass="panel-header">
+                                                    <Label styleClass="panel-title" text="Aksi Cepat" />
+                                                </HBox>
+                                                <VBox spacing="0.0">
+                                                    <Button maxWidth="Infinity" onAction="#navTransaksi" styleClass="quick-action-btn" accessibleText="Catat kendaraan masuk"><graphic><HBox alignment="CENTER_LEFT" maxWidth="Infinity"><Label text="Catat kendaraan masuk"/><Region HBox.hgrow="ALWAYS"/><SVGPath content="M3 12h18 M15 6l6 6-6 6" style="-fx-fill: transparent; -fx-stroke: #777777; -fx-stroke-width: 1.5;"/></HBox></graphic></Button>
+                                                    <Button maxWidth="Infinity" onAction="#aksiCepatKeluar" styleClass="quick-action-btn" accessibleText="Proses kendaraan keluar"><graphic><HBox alignment="CENTER_LEFT" maxWidth="Infinity"><Label text="Proses kendaraan keluar"/><Region HBox.hgrow="ALWAYS"/><SVGPath content="M3 12h18 M15 6l6 6-6 6" style="-fx-fill: transparent; -fx-stroke: #777777; -fx-stroke-width: 1.5;"/></HBox></graphic></Button>
+                                                    <Button maxWidth="Infinity" onAction="#navSlot" styleClass="quick-action-btn" accessibleText="Kelola slot parkir"><graphic><HBox alignment="CENTER_LEFT" maxWidth="Infinity"><Label text="Kelola slot parkir"/><Region HBox.hgrow="ALWAYS"/><SVGPath content="M3 12h18 M15 6l6 6-6 6" style="-fx-fill: transparent; -fx-stroke: #777777; -fx-stroke-width: 1.5;"/></HBox></graphic></Button>
+                                                    <Button maxWidth="Infinity" onAction="#navLaporan" styleClass="quick-action-btn" accessibleText="Lihat laporan pendapatan"><graphic><HBox alignment="CENTER_LEFT" maxWidth="Infinity"><Label text="Lihat laporan pendapatan"/><Region HBox.hgrow="ALWAYS"/><SVGPath content="M3 12h18 M15 6l6 6-6 6" style="-fx-fill: transparent; -fx-stroke: #777777; -fx-stroke-width: 1.5;"/></HBox></graphic></Button>
+                                                </VBox>
+                                            </VBox>
+
+                                        </VBox>
+                                    </HBox>
+
+                                    <!-- Panel C: Ketersediaan Slot Realtime -->
+                                    <VBox styleClass="panel-box">
+                                        <HBox alignment="CENTER_LEFT" styleClass="panel-header">
+                                            <Label styleClass="panel-title" text="Ketersediaan Slot" />
+                                            <Region HBox.hgrow="ALWAYS" />
+                                            <Button onAction="#navSlot" style="-fx-background-color: transparent; -fx-font-family: 'IBM Plex Mono', monospace; -fx-font-size: 11px; -fx-text-fill: #666; -fx-cursor: hand;" text="KELOLA SLOT"><graphic><SVGPath content="M3 12h18 M15 6l6 6-6 6" style="-fx-fill: transparent; -fx-stroke: #666666; -fx-stroke-width: 1.5;" /></graphic></Button>
+                                        </HBox>
+                                        <HBox spacing="0.0">
+                                            <!-- Zona A: Roda 2 -->
+                                            <VBox spacing="8.0" style="-fx-padding: 20; -fx-border-color: transparent #dedede transparent transparent; -fx-border-width: 1;" HBox.hgrow="ALWAYS">
+                                                <HBox alignment="CENTER_LEFT">
+                                                    <VBox>
+                                                        <Label style="-fx-font-family: 'IBM Plex Mono', monospace; -fx-font-size: 11px; -fx-text-fill: #777;" text="ZONA A" />
+                                                        <Label style="-fx-font-weight: bold; -fx-font-size: 14px;" text="Motor / Roda 2" />
+                                                    </VBox>
+                                                    <Region HBox.hgrow="ALWAYS" />
+                                                    <Label fx:id="lblSlotRoda2" style="-fx-font-family: 'IBM Plex Mono', monospace; -fx-font-size: 22px; -fx-font-weight: bold;" text="2 / 2" />
+                                                </HBox>
+                                                <ProgressBar fx:id="pbRoda2" maxWidth="Infinity" prefHeight="8.0" progress="0.0" />
+                                                <Label fx:id="lblSlotInfoRoda2" style="-fx-font-size: 11px; -fx-text-fill: #777;" text="0 terisi · 2 tersedia" />
+                                            </VBox>
+
+                                            <!-- Zona B: Roda 4 -->
+                                            <VBox spacing="8.0" style="-fx-padding: 20; -fx-border-color: transparent #dedede transparent transparent; -fx-border-width: 1;" HBox.hgrow="ALWAYS">
+                                                <HBox alignment="CENTER_LEFT">
+                                                    <VBox>
+                                                        <Label style="-fx-font-family: 'IBM Plex Mono', monospace; -fx-font-size: 11px; -fx-text-fill: #777;" text="ZONA B" />
+                                                        <Label style="-fx-font-weight: bold; -fx-font-size: 14px;" text="Mobil / Roda 4" />
+                                                    </VBox>
+                                                    <Region HBox.hgrow="ALWAYS" />
+                                                    <Label fx:id="lblSlotRoda4" style="-fx-font-family: 'IBM Plex Mono', monospace; -fx-font-size: 22px; -fx-font-weight: bold;" text="2 / 2" />
+                                                </HBox>
+                                                <ProgressBar fx:id="pbRoda4" maxWidth="Infinity" prefHeight="8.0" progress="0.0" />
+                                                <Label fx:id="lblSlotInfoRoda4" style="-fx-font-size: 11px; -fx-text-fill: #777;" text="0 terisi · 2 tersedia" />
+                                            </VBox>
+
+                                            <!-- Zona C: Truk -->
+                                            <VBox spacing="8.0" style="-fx-padding: 20;" HBox.hgrow="ALWAYS">
+                                                <HBox alignment="CENTER_LEFT">
+                                                    <VBox>
+                                                        <Label style="-fx-font-family: 'IBM Plex Mono', monospace; -fx-font-size: 11px; -fx-text-fill: #777;" text="ZONA C" />
+                                                        <Label style="-fx-font-weight: bold; -fx-font-size: 14px;" text="Kendaraan Besar / Truk" />
+                                                    </VBox>
+                                                    <Region HBox.hgrow="ALWAYS" />
+                                                    <Label fx:id="lblSlotTruk" style="-fx-font-family: 'IBM Plex Mono', monospace; -fx-font-size: 22px; -fx-font-weight: bold;" text="1 / 1" />
+                                                </HBox>
+                                                <ProgressBar fx:id="pbTruk" maxWidth="Infinity" prefHeight="8.0" progress="0.0" />
+                                                <Label fx:id="lblSlotInfoTruk" style="-fx-font-size: 11px; -fx-text-fill: #777;" text="0 terisi · 1 tersedia" />
+                                            </VBox>
+                                        </HBox>
+                                    </VBox>
+                                </VBox>
+
+                                <!-- ═════════════════════════════════════════════════
+                                     HALAMAN 2: TRANSAKSI PARKIR
+                                     ═════════════════════════════════════════════════ -->
+                                <VBox fx:id="vboxTransaksi" spacing="20.0" visible="false" managed="false">
+                                    <HBox spacing="20.0">
+                                        <!-- Form Input Kendaraan Masuk / Edit (Kiri 340px) -->
+                                        <VBox prefWidth="360.0" styleClass="panel-box">
+                                            <HBox alignment="CENTER_LEFT" styleClass="panel-header">
+                                                <Label fx:id="lblFormTitle" styleClass="panel-title" text="Kendaraan Masuk" />
+                                            </HBox>
+                                            <VBox spacing="16.0" style="-fx-padding: 16;">
+                                                <VBox spacing="8.0">
+                                                    <Label styleClass="field-label" text="PLAT NOMOR" />
+                                                    <TextField fx:id="txtPlatNomor" promptText="Contoh: B 1234 ABC" styleClass="input-field" />
+                                                </VBox>
+
+                                                <VBox spacing="8.0">
+                                                    <Label styleClass="field-label" text="MERK KENDARAAN" />
+                                                    <TextField fx:id="txtMerkKendaraan" promptText="Contoh: Honda Vario" styleClass="input-field" />
+                                                </VBox>
+
+                                                <VBox spacing="8.0">
+                                                    <Label styleClass="field-label" text="JENIS KENDARAAN" />
+                                                    <ComboBox fx:id="cmbJenisKendaraan" maxWidth="Infinity" styleClass="input-field" />
+                                                </VBox>
+
+                                                <VBox spacing="8.0">
+                                                    <Label styleClass="field-label" text="SLOT TERSEDIA" />
+                                                    <ComboBox fx:id="cmbSlotParkir" maxWidth="Infinity" promptText="Pilih slot..." styleClass="input-field" />
+                                                </VBox>
+
+                                                <VBox spacing="8.0">
+                                                    <Label styleClass="field-label" text="STATUS PELANGGAN" />
+                                                    <HBox alignment="CENTER_LEFT" minHeight="42.0" spacing="16.0" style="-fx-border-color: #bcbcbc; -fx-border-width: 1; -fx-padding: 0 12; -fx-background-color: white;">
+                                                        <fx:define>
+                                                            <ToggleGroup fx:id="tgMember" />
+                                                        </fx:define>
+                                                        <RadioButton fx:id="rbUmum" selected="true" text="Umum" toggleGroup="$tgMember" />
+                                                        <RadioButton fx:id="rbMember" text="Member" toggleGroup="$tgMember" />
+                                                    </HBox>
+                                                </VBox>
+
+                                                <VBox spacing="8.0">
+                                                    <Label styleClass="field-label" text="WAKTU MASUK" />
+                                                    <HBox styleClass="datetime-row" alignment="CENTER_LEFT" spacing="12.0" maxWidth="Infinity">
+                                                        <DatePicker fx:id="dpWaktuMasuk" minWidth="170.0" prefWidth="190.0" maxWidth="Infinity" styleClass="input-field, datetime-date" HBox.hgrow="ALWAYS" />
+                                                        <TextField fx:id="txtJamMasuk" minWidth="112.0" prefWidth="120.0" maxWidth="120.0" promptText="HH:mm" styleClass="input-field, datetime-time" />
+                                                    </HBox>
+                                                </VBox>
+
+                                                <CheckBox fx:id="chkTitipHelm" text="Titip helm (+Rp 2.000)" />
+
+                                                <HBox spacing="8.0">
+                                                    <padding>
+                                                        <Insets top="8.0" />
+                                                    </padding>
+                                                    <Button fx:id="btnSimpanTransaksi" maxWidth="Infinity" onAction="#simpanTransaksi" styleClass="btn-primary" text="SIMPAN DATA" HBox.hgrow="ALWAYS" />
+                                                    <Button fx:id="btnResetForm" onAction="#resetFormTransaksi" styleClass="btn-secondary" text="RESET" />
+                                                </HBox>
+                                            </VBox>
+                                        </VBox>
+
+                                        <!-- Tabel Transaksi (Kanan Flex) -->
+                                        <VBox styleClass="panel-box" HBox.hgrow="ALWAYS">
+                                            <HBox alignment="CENTER_LEFT" styleClass="panel-header">
+                                                <Label styleClass="panel-title" text="Daftar Transaksi" />
+                                            </HBox>
+                                            <HBox alignment="CENTER_LEFT" spacing="12.0" style="-fx-padding: 16; -fx-border-color: transparent transparent #dddddd transparent; -fx-border-width: 0 0 1 0;">
+                                                <TextField fx:id="txtCari" prefWidth="256.0" promptText="Cari plat nomor..." styleClass="input-field" />
+                                                <ComboBox fx:id="cmbFilterStatus" prefWidth="192.0" promptText="Semua status" styleClass="input-field" />
+                                            </HBox>
+
+                                            <TableView fx:id="tblTransaksi" VBox.vgrow="ALWAYS">
+                                                <columns>
+                                                    <TableColumn fx:id="colIdTransaksi" prefWidth="85.0" text="ID TRANSAKSI" />
+                                                    <TableColumn fx:id="colKendaraan" prefWidth="210.0" text="KENDARAAN" />
+                                                    <TableColumn fx:id="colSlot" prefWidth="70.0" text="SLOT" />
+                                                    <TableColumn fx:id="colWaktuMasuk" prefWidth="105.0" text="MASUK" />
+                                                    <TableColumn fx:id="colStatus" prefWidth="90.0" text="STATUS" />
+                                                    <TableColumn fx:id="colAksi" prefWidth="270.0" text="AKSI" />
+                                                </columns>
+                                                <placeholder>
+                                                    <Label style="-fx-text-fill: #888;" text="Tidak ada transaksi yang sesuai." />
+                                                </placeholder>
+                                            </TableView>
+
+                                            <HBox alignment="CENTER_LEFT" spacing="8.0" style="-fx-padding: 12 16; -fx-border-color: #dedede transparent transparent transparent; -fx-border-width: 1;">
+                                                <Label fx:id="lblJumlahTransaksi" style="-fx-font-family: 'IBM Plex Mono', monospace; -fx-font-size: 11px; -fx-text-fill: #777;" text="0 transaksi ditemukan" />
+                                            </HBox>
+                                        </VBox>
+                                    </HBox>
+                                </VBox>
+
+                                <!-- ═════════════════════════════════════════════════
+                                     HALAMAN 3: MANAJEMEN SLOT
+                                     ═════════════════════════════════════════════════ -->
+                                <VBox fx:id="vboxSlot" spacing="20.0" visible="false" managed="false">
+                                    <!-- 3 Top Stat Cards -->
+                                    <HBox spacing="16.0">
+                                        <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                                            <Label styleClass="stat-card-label" text="Total slot" />
+                                            <Label fx:id="lblTotalSlot" styleClass="stat-card-value" text="05" />
+                                        </VBox>
+                                        <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                                            <Label styleClass="stat-card-label" text="Tersedia" />
+                                            <Label fx:id="lblSlotTersedia" styleClass="stat-card-value" text="05" />
+                                        </VBox>
+                                        <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                                            <Label styleClass="stat-card-label" text="Terisi" />
+                                            <Label fx:id="lblSlotTerisi" styleClass="stat-card-value" text="00" />
+                                        </VBox>
+                                    </HBox>
+
+                                    <!-- Bottom Row: Form Tambah Slot & Tabel Slot -->
+                                    <HBox spacing="20.0">
+                                        <!-- Form Input Slot (320px) -->
+                                        <VBox prefWidth="280.0" styleClass="panel-box">
+                                            <HBox alignment="CENTER_LEFT" styleClass="panel-header">
+                                                <Label fx:id="lblSlotFormTitle" styleClass="panel-title" text="Tambah Slot" />
+                                            </HBox>
+                                            <VBox spacing="16.0" style="-fx-padding: 16;">
+                                                <VBox spacing="6.0">
+                                                    <Label styleClass="field-label" text="ZONA" />
+                                                    <ComboBox fx:id="cmbLantaiZona" maxWidth="Infinity" styleClass="input-field" />
+                                                </VBox>
+                                                <VBox spacing="6.0">
+                                                    <Label styleClass="field-label" text="NOMOR SLOT" />
+                                                    <TextField fx:id="txtKodeSlot" promptText="Contoh: 01" styleClass="input-field" />
+                                                </VBox>
+                                                <VBox spacing="6.0">
+                                                    <Label styleClass="field-label" text="JENIS KENDARAAN" />
+                                                    <TextField fx:id="txtJenisSlot" editable="false" focusTraversable="false" maxWidth="Infinity" styleClass="input-field" />
+                                                </VBox>
+                                                <HBox spacing="8.0">
+                                                    <padding>
+                                                        <Insets top="8.0" />
+                                                    </padding>
+                                                    <Button fx:id="btnSimpanSlot" maxWidth="Infinity" onAction="#simpanSlot" styleClass="btn-primary" text="SIMPAN SLOT" HBox.hgrow="ALWAYS" />
+                                                    <Button onAction="#resetFormSlot" styleClass="btn-secondary" text="RESET" />
+                                                </HBox>
+                                            </VBox>
+                                        </VBox>
+
+                                        <!-- Grid Slot (Kanan Flex) -->
+                                        <VBox styleClass="panel-box" HBox.hgrow="ALWAYS">
+                                            <HBox alignment="CENTER_LEFT" styleClass="panel-header">
+                                                <Label styleClass="panel-title" text="Daftar Slot Parkir" />
+                                                <Region HBox.hgrow="ALWAYS" />
+                                                <Label style="-fx-font-family: 'IBM Plex Mono', monospace; -fx-font-size: 11px; -fx-text-fill: #777;" text="FILTER:" />
+                                                <ComboBox fx:id="cmbFilterSlot" onAction="#filterSlot" prefWidth="130.0" styleClass="input-field">
+                                                    <HBox.margin>
+                                                        <Insets left="8.0" />
+                                                    </HBox.margin>
+                                                </ComboBox>
+                                            </HBox>
+
+                                            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-background: transparent;">
+                                                <content><FlowPane fx:id="fpSlotGrid" hgap="12.0" vgap="12.0" style="-fx-padding: 20; -fx-background-color: #fcfcfc;" /></content>
+                                            </ScrollPane>
+                                            <TableView fx:id="tblSlot" managed="false" visible="false" prefHeight="0.0">
+                                                <columns>
+                                                    <TableColumn fx:id="colKodeSlot" text="KODE" />
+                                                    <TableColumn fx:id="colLantaiZona" text="ZONA" />
+                                                    <TableColumn fx:id="colJenisSlot" text="JENIS" />
+                                                    <TableColumn fx:id="colStatusSlot" text="STATUS" />
+                                                </columns>
+                                            </TableView>
+                                        </VBox>
+                                    </HBox>
+                                </VBox>
+
+                                <!-- ═════════════════════════════════════════════════
+                                     HALAMAN 4: LAPORAN PENDAPATAN
+                                     ═════════════════════════════════════════════════ -->
+                                <VBox fx:id="vboxLaporan" spacing="20.0" visible="false" managed="false">
+                                    <!-- Panel Filter Laporan -->
+                                    <VBox styleClass="panel-box">
+                                        <HBox alignment="CENTER_LEFT" styleClass="panel-header">
+                                            <Label styleClass="panel-title" text="Filter Laporan Transaksi" />
+                                        </HBox>
+                                        <HBox alignment="CENTER_LEFT" spacing="16.0" style="-fx-padding: 16 20;">
+                                            <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                                <Label styleClass="field-label" text="DARI TANGGAL" />
+                                                <DatePicker fx:id="dpLaporanDari" maxWidth="Infinity" styleClass="input-field" />
+                                            </VBox>
+                                            <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                                <Label styleClass="field-label" text="SAMPAI TANGGAL" />
+                                                <DatePicker fx:id="dpLaporanSampai" maxWidth="Infinity" styleClass="input-field" />
+                                            </VBox>
+                                            <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                                <Label styleClass="field-label" text="STATUS" />
+                                                <ComboBox fx:id="cmbLaporanStatus" maxWidth="Infinity" styleClass="input-field" />
+                                            </VBox>
+                                            <VBox alignment="BOTTOM_LEFT">
+                                                <Button onAction="#terapkanFilterLaporan" styleClass="btn-primary" text="TERAPKAN" />
+                                            </VBox>
+                                        </HBox>
+                                    </VBox>
+
+                                    <!-- 4 Summary KPI Cards Laporan -->
+                                    <HBox spacing="16.0">
+                                        <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                                            <Label styleClass="stat-card-label" text="TOTAL TRANSAKSI" />
+                                            <Label fx:id="lblLapTotalTx" styleClass="stat-card-value" text="00" />
+                                        </VBox>
+                                        <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                                            <Label styleClass="stat-card-label" text="SEDANG PARKIR" />
+                                            <Label fx:id="lblLapAktif" styleClass="stat-card-value" text="00" />
+                                        </VBox>
+                                        <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                                            <Label styleClass="stat-card-label" text="SELESAI" />
+                                            <Label fx:id="lblLapSelesai" styleClass="stat-card-value" text="00" />
+                                        </VBox>
+                                        <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                                            <Label styleClass="stat-card-label" text="TOTAL PENDAPATAN" />
+                                            <Label fx:id="lblLapPendapatan" styleClass="stat-card-value" text="Rp 0" />
+                                        </VBox>
+                                    </HBox>
+
+                                    <!-- Panel Riwayat Transaksi -->
+                                    <VBox styleClass="panel-box">
+                                        <HBox alignment="CENTER_LEFT" styleClass="panel-header">
+                                            <Label styleClass="panel-title" text="Riwayat Transaksi" />
+                                        </HBox>
+                                        <TableView fx:id="tblLaporan" prefHeight="320.0">
+                                            <columns>
+                                                <TableColumn fx:id="colLapId" prefWidth="90.0" text="ID" />
+                                                <TableColumn fx:id="colLapPlat" prefWidth="120.0" text="PLAT NOMOR" />
+                                                <TableColumn fx:id="colLapMerk" prefWidth="140.0" text="KENDARAAN" />
+                                                <TableColumn fx:id="colLapJenis" prefWidth="90.0" text="JENIS" />
+                                                <TableColumn fx:id="colLapSlot" prefWidth="70.0" text="SLOT" />
+                                                <TableColumn fx:id="colLapMasuk" prefWidth="130.0" text="MASUK" />
+                                                <TableColumn fx:id="colLapKeluar" prefWidth="130.0" text="KELUAR" />
+                                                <TableColumn fx:id="colLapStatus" prefWidth="95.0" text="STATUS" />
+                                                <TableColumn fx:id="colLapBiaya" prefWidth="110.0" text="TOTAL BIAYA" />
+                                            </columns>
+                                            <placeholder>
+                                                <Label style="-fx-text-fill: #888;" text="Tidak ada data transaksi untuk filter ini." />
+                                            </placeholder>
+                                        </TableView>
+                                        <HBox alignment="CENTER_RIGHT" spacing="10.0" style="-fx-padding: 12 16; -fx-border-color: #dedede transparent transparent transparent; -fx-border-width: 1;">
+                                            <Button onAction="#eksporCSV" styleClass="btn-secondary" text="EKSPOR CSV"><graphic><SVGPath content="M12 3v12 M7 10l5 5 5-5 M5 20h14" style="-fx-fill: transparent; -fx-stroke: #222222; -fx-stroke-width: 1.6;" /></graphic></Button>
+                                            <Button onAction="#cetakLaporan" styleClass="btn-primary" text="CETAK LAPORAN" />
+                                        </HBox>
+                                    </VBox>
+                                </VBox>
+
+                            </StackPane>
+
+                            <!-- Footer Bar Bawah -->
+                            <HBox alignment="CENTER_LEFT" style="-fx-border-color: #d1d1d1 transparent transparent transparent; -fx-border-width: 1; -fx-padding: 16 0 0 0;">
+                                <Label style="-fx-font-family: 'IBM Plex Mono', monospace; -fx-font-size: 10px; -fx-text-fill: #777;" text="PARKIR KAMPUS — SISTEM MANAJEMEN PARKIR" />
+                                <Region HBox.hgrow="ALWAYS" />
+                                <Label style="-fx-font-family: 'IBM Plex Mono', monospace; -fx-font-size: 10px; -fx-text-fill: #777;" text="PROTOTIPE INTERAKTIF · SQLite parkir.db" />
+                            </HBox>
+
+                        </VBox>
+                    </content>
+                </ScrollPane>
+
+            </VBox>
+
+            <!-- Floating Notice Toast Notification (Bottom Right) -->
+            <HBox fx:id="boxNotice" alignment="CENTER_LEFT" maxWidth="480.0" spacing="12.0" style="-fx-background-color: #202020; -fx-border-color: #777; -fx-border-width: 1; -fx-padding: 12 18; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 4);" visible="false" managed="false" StackPane.alignment="BOTTOM_RIGHT">
+                <StackPane.margin>
+                    <Insets bottom="24.0" right="24.0" />
+                </StackPane.margin>
+                <children>
+                    <Label fx:id="lblNoticeText" style="-fx-text-fill: white; -fx-font-size: 13px;" text="Notifikasi sistem" wrapText="true" HBox.hgrow="ALWAYS" />
+                    <Button onAction="#tutupNotice" style="-fx-background-color: transparent; -fx-text-fill: #bbb; -fx-font-size: 16px; -fx-cursor: hand;"><graphic><SVGPath content="M5 5l14 14 M19 5L5 19" style="-fx-fill: transparent; -fx-stroke: #bbbbbb; -fx-stroke-width: 1.8;" /></graphic></Button>
+                </children>
+            </HBox>
+
+        </StackPane>
+    </center>
+
+</BorderPane>
